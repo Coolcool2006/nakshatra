@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { MoonPhase, EclipticGeoMoon } from 'astronomy-engine';
 import Loader from './components/Loader';
 import NakshatraDetails from './components/NakshatraDetails';
-import Clock from './components/Clock';
+import Clock from './components/clock';
 
 const NAKSHATRA_LIST = [
   "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashirsha", "Ardra", 
