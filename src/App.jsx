@@ -38,13 +38,25 @@ function App() {
           typeof window !== 'undefined' &&
           window.Capacitor &&
           window.Capacitor.isNativePlatform &&
-          window.Capacitor.isNativePlatform()
+          window.Capacitor.isNativePlatform() &&
+          window.Capacitor.getPlatform &&
+          ['android', 'ios'].includes(window.Capacitor.getPlatform())
         ) {
-          // Dynamically import Geolocation for native only at runtime using a variable path
-          const geoPath = '@capacitor/geolocation';
-          const GeolocationModule = await import(/* @vite-ignore */ geoPath);
-          const position = await GeolocationModule.Geolocation.getCurrentPosition();
-          coords = position.coords;
+          try {
+            const geoPath = '@capacitor/geolocation';
+            const GeolocationModule = await import(/* @vite-ignore */ geoPath);
+            const position = await GeolocationModule.Geolocation.getCurrentPosition();
+            coords = position.coords;
+          } catch (e) {
+            // fallback to browser geolocation if import fails
+            coords = await new Promise((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(
+                pos => resolve(pos.coords),
+                reject,
+                { timeout: 10000 }
+              );
+            });
+          }
         } else {
           // Use browser geolocation for web
           coords = await new Promise((resolve, reject) => {
