@@ -34,10 +34,15 @@ function App() {
     const calculateNakshatra = async () => {
       try {
         let coords;
-        if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
-          // Dynamically import Geolocation for native
-          const { Geolocation } = await import('@capacitor/geolocation');
-          const position = await Geolocation.getCurrentPosition();
+        if (
+          typeof window !== 'undefined' &&
+          window.Capacitor &&
+          window.Capacitor.isNativePlatform &&
+          window.Capacitor.isNativePlatform()
+        ) {
+          // Dynamically import Geolocation for native only at runtime
+          const GeolocationModule = await import(/* @vite-ignore */ '@capacitor/geolocation');
+          const position = await GeolocationModule.Geolocation.getCurrentPosition();
           coords = position.coords;
         } else {
           // Use browser geolocation for web
