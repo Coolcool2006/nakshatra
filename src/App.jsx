@@ -5,7 +5,6 @@ import { MoonPhase, EclipticGeoMoon } from 'astronomy-engine';
 import Loader from './components/Loader';
 import NakshatraDetails from './components/NakshatraDetails';
 import Clock from './components/clock';
-import { Geolocation } from '@capacitor/geolocation';
 
 const NAKSHATRA_LIST = [
   "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashirsha", "Ardra", 
@@ -36,7 +35,8 @@ function App() {
       try {
         let coords;
         if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
-          // Use Capacitor Geolocation for native
+          // Dynamically import Geolocation for native
+          const { Geolocation } = await import('@capacitor/geolocation');
           const position = await Geolocation.getCurrentPosition();
           coords = position.coords;
         } else {
