@@ -5,6 +5,7 @@ import { MoonPhase, EclipticGeoMoon } from 'astronomy-engine';
 import Loader from './components/Loader';
 import NakshatraDetails from './components/NakshatraDetails';
 import Clock from './components/clock';
+import { Geolocation } from '@capacitor/geolocation';
 
 const NAKSHATRA_LIST = [
   "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashirsha", "Ardra", 
@@ -33,10 +34,22 @@ function App() {
   useEffect(() => {
     const calculateNakshatra = async () => {
       try {
-        const position = await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
-        });
-        const { latitude, longitude } = position.coords;
+        let coords;
+        if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+          // Use Capacitor Geolocation for native
+          const position = await Geolocation.getCurrentPosition();
+          coords = position.coords;
+        } else {
+          // Use browser geolocation for web
+          coords = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+              pos => resolve(pos.coords),
+              reject,
+              { timeout: 10000 }
+            );
+          });
+        }
+        const { latitude, longitude } = coords;
         setLocation(`Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`);
         // Fetch place name using Nominatim
         fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
@@ -76,7 +89,7 @@ function App() {
         });
       } catch (err) {
         if (err.code === 1) {
-          setError("Location permission was denied. Please enable it in your browser settings.");
+          setError("Location permission was denied. Please enable it in your app settings.");
         } else {
           setError(err.message || "An unknown error occurred during calculation.");
         }
