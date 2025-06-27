@@ -40,8 +40,9 @@ function App() {
           window.Capacitor.isNativePlatform &&
           window.Capacitor.isNativePlatform()
         ) {
-          // Dynamically import Geolocation for native only at runtime
-          const GeolocationModule = await import(/* @vite-ignore */ '@capacitor/geolocation');
+          // Dynamically import Geolocation for native only at runtime using a variable path
+          const geoPath = '@capacitor/geolocation';
+          const GeolocationModule = await import(/* @vite-ignore */ geoPath);
           const position = await GeolocationModule.Geolocation.getCurrentPosition();
           coords = position.coords;
         } else {
